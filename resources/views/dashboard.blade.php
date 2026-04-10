@@ -85,6 +85,22 @@
     </div>
 
     <div class="main-content">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end;">
+            <div>
+                <label for="fromDate" style="font-weight: 600; display: block; margin-bottom: 8px;">Dari Tanggal</label>
+                <input id="fromDate" type="date" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 10px;" />
+            </div>
+            <div>
+                <label for="toDate" style="font-weight: 600; display: block; margin-bottom: 8px;">Sampai Tanggal</label>
+                <input id="toDate" type="date" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 10px;" />
+            </div>
+            <div style="margin-top: 24px;">
+                <button id="filterButton" style="padding: 10px 20px; border: none; border-radius: 999px; background-color: #10b981; color: white; font-weight: 700; cursor: pointer;">Filter</button>
+            </div>
+            <div style="margin-top: 24px;">
+                <button id="resetButton" style="padding: 10px 20px; border: none; border-radius: 999px; background-color: #3b82f6; color: white; font-weight: 700; cursor: pointer;">Reset</button>
+            </div>
+        </div>
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
             <div style="width: 400px;">
                 <h3>Jenis Kelamin</h3>
@@ -102,14 +118,36 @@
     </div>
     
     <script>
-        async function loadDashboardData() {
+        let genderChart = null;
+        let ageChart = null;
+        let dailyChart = null;
+
+        function destroyChart(chart) {
+            if (chart) {
+                chart.destroy();
+            }
+        }
+
+        async function loadDashboardData(from = '', to = '') {
             try {
-                const response = await fetch('/api/dashboard/data');
+                let url = '/api/dashboard/data';
+                const params = new URLSearchParams();
+
+                if (from) params.append('from', from);
+                if (to) params.append('to', to);
+                if ([...params].length) {
+                    url += `?${params.toString()}`;
+                }
+
+                const response = await fetch(url);
                 const data = await response.json();
-                
-                // Gender Pie Chart
+
+                destroyChart(genderChart);
+                destroyChart(ageChart);
+                destroyChart(dailyChart);
+
                 const genderCtx = document.getElementById('genderChart').getContext('2d');
-                new Chart(genderCtx, {
+                genderChart = new Chart(genderCtx, {
                     type: 'pie',
                     data: {
                         labels: Object.keys(data.gender),
@@ -128,10 +166,9 @@
                         }
                     }
                 });
-                
-                // Age Pie Chart
+
                 const ageCtx = document.getElementById('ageChart').getContext('2d');
-                new Chart(ageCtx, {
+                ageChart = new Chart(ageCtx, {
                     type: 'pie',
                     data: {
                         labels: Object.keys(data.age),
@@ -153,9 +190,8 @@
                     }
                 });
 
-                // Daily Column Chart
                 const dailyCtx = document.getElementById('dailyChart').getContext('2d');
-                new Chart(dailyCtx, {
+                dailyChart = new Chart(dailyCtx, {
                     type: 'bar',
                     data: {
                         labels: Object.keys(data.daily),
@@ -198,9 +234,20 @@
                 console.error('Error loading dashboard data:', error);
             }
         }
-        
-        // Load data when page loads
-        window.addEventListener('load', loadDashboardData);
+
+        document.getElementById('filterButton').addEventListener('click', () => {
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            loadDashboardData(fromDate, toDate);
+        });
+
+        document.getElementById('resetButton').addEventListener('click', () => {
+            document.getElementById('fromDate').value = '';
+            document.getElementById('toDate').value = '';
+            loadDashboardData();
+        });
+
+        window.addEventListener('load', () => loadDashboardData());
     </script>
 </body>
 </html>
