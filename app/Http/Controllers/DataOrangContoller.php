@@ -7,12 +7,34 @@ use Illuminate\Http\Request;
 
 class DataOrangContoller extends Controller
 {
+    /**
+     * Function untuk melakukan pencarian data
+     * @param string $keyword - kata kunci pencarian
+     * @return Collection data yang sesuai dengan pencarian
+     */
+    public function search($keyword)
+    {
+        return DataOrangModel::where('nama', 'like', '%' . $keyword . '%')
+                             ->orWhere('alamat', 'like', '%' . $keyword . '%')
+                             ->orWhere('jenis_kelamin', 'like', '%' . $keyword . '%')
+                             ->get();
+    }
+
+    /**
+     * Function untuk AJAX search - digunakan oleh live search
+     * @param Request $request
+     * @return JSON
+     */
+    public function searchAjax(Request $request)
+    {
+        $keyword = $request->get('q', '');
+        $results = $keyword ? $this->search($keyword) : [];
+        return response()->json($results);
+    }
+
     public function index(Request $request){
         $search = $request->get('search');
-        $data_orang = DataOrangModel::when($search, function ($query, $search) {
-            return $query->where('nama', 'like', '%' . $search . '%')
-                         ->orWhere('alamat', 'like', '%' . $search . '%');
-        })->get();
+        $data_orang = $search ? $this->search($search) : DataOrangModel::all();
         return view('manajemen_data', compact('data_orang', 'search'));
     }
 

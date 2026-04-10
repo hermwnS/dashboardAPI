@@ -62,34 +62,10 @@
             overflow-y: auto;
         }
 
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
         .page-title {
+            margin-bottom: 20px;
             font-size: 1.7rem;
             letter-spacing: 0.02em;
-            margin: 0;
-        }
-
-        .sync-button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 999px;
-            background-color: #10b981;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-            font-size: 0.9rem;
-        }
-
-        .sync-button:hover {
-            background-color: #059669;
-            transform: translateY(-1px);
         }
 
         .content-card {
@@ -205,6 +181,30 @@
             text-decoration: underline;
         }
 
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sync-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 999px;
+            background-color: #10b981;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .sync-button:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
         .search-form {
             display: flex;
             gap: 12px;
@@ -212,8 +212,13 @@
             align-items: center;
         }
 
-        .search-form input[type="text"] {
+        .search-container {
+            position: relative;
             flex: 1;
+        }
+
+        .search-form input[type="text"] {
+            width: 100%;
             padding: 10px 14px;
             border: 1px solid #d1d5db;
             border-radius: 12px;
@@ -228,19 +233,66 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .search-form button {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 12px;
-            background-color: #6b7280;
-            color: white;
-            font-weight: 600;
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
 
-        .search-form button:hover {
-            background-color: #4b5563;
+        .search-result-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .search-result-item strong {
+            color: #1f2937;
+            display: block;
+        }
+
+        .search-result-item small {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row {
+                justify-content: stretch;
+            }
+
+            .button-row button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -292,8 +344,10 @@
 
         <section class="content-card">
             <form method="GET" action="/manajemen_data" class="search-form">
-                <input type="text" name="search" placeholder="Cari berdasarkan nama atau alamat..." value="{{ $search ?? '' }}">
-                <button type="submit">Cari</button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" name="search" placeholder="Cari berdasarkan nama atau alamat..." value="{{ $search ?? '' }}" autocomplete="off">
+                    <div class="search-results" id="searchResults"></div>
+                </div>
             </form>
             <table class="data-table">
                 <thead>
@@ -324,5 +378,57 @@
             </table>
         </section>
     </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        // Live search functionality
+        searchInput.addEventListener('input', async function() {
+            const keyword = this.value.trim();
+
+            if (keyword.length < 1) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/manajemen_data/search-ajax?q=${encodeURIComponent(keyword)}`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    let html = '';
+                    data.forEach((item) => {
+                        html += `
+                            <div class="search-result-item" onclick="selectResult('${item.nama}')">
+                                <strong>${item.nama}</strong>
+                                <small>${item.alamat}</small>
+                            </div>
+                        `;
+                    });
+                    searchResults.innerHTML = html;
+                    searchResults.classList.add('active');
+                } else {
+                    searchResults.innerHTML = '<div class="no-results">Tidak ada hasil ditemukan</div>';
+                    searchResults.classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+            }
+        });
+
+        // Select result
+        function selectResult(nama) {
+            searchInput.value = nama;
+            searchResults.classList.remove('active');
+        }
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.search-container')) {
+                searchResults.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
