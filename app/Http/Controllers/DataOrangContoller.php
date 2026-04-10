@@ -32,6 +32,16 @@ class DataOrangContoller extends Controller
         return response()->json($results);
     }
 
+    /**
+     * Function untuk sync data - mengembalikan semua data orang
+     * @return JSON
+     */
+    public function syncData()
+    {
+        $data_orang = DataOrangModel::all();
+        return response()->json($data_orang);
+    }
+
     public function index(Request $request){
         $search = $request->get('search');
         $data_orang = $search ? $this->search($search) : DataOrangModel::all();

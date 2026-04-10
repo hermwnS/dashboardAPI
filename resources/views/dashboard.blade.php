@@ -97,5 +97,64 @@
         </div>
     </div>
     
+    <script>
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/dashboard/data');
+                const data = await response.json();
+                
+                // Gender Pie Chart
+                const genderCtx = document.getElementById('genderChart').getContext('2d');
+                new Chart(genderCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data.gender),
+                        datasets: [{
+                            data: Object.values(data.gender),
+                            backgroundColor: ['#3498db', '#e74c3c'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+                
+                // Age Pie Chart
+                const ageCtx = document.getElementById('ageChart').getContext('2d');
+                new Chart(ageCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data.age),
+                        datasets: [{
+                            data: Object.values(data.age),
+                            backgroundColor: [
+                                '#1abc9c', '#2ecc71', '#3498db', '#9b59b6'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+        
+        // Load data when page loads
+        window.addEventListener('load', loadDashboardData);
+    </script>
 </body>
 </html>

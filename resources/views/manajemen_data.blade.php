@@ -429,6 +429,40 @@
                 searchResults.classList.remove('active');
             }
         });
+
+        // Sync Data functionality
+        document.querySelector('.sync-button').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/manajemen_data/sync-data');
+                const data = await response.json();
+                
+                // Update table body
+                const tbody = document.querySelector('.data-table tbody');
+                tbody.innerHTML = '';
+                
+                data.forEach((orang, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${orang.nama}</td>
+                            <td>${orang.alamat}</td>
+                            <td>${orang.jenis_kelamin}</td>
+                            <td>${orang.usia}</td>
+                            <td>
+                                <a href="/manajemen_data/edit/${orang.id}">Edit</a>
+                                <a href="/manajemen_data/delete/${orang.id}">Delete</a>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+                
+                alert('Data berhasil di-sync!');
+            } catch (error) {
+                console.error('Error syncing data:', error);
+                alert('Gagal sync data!');
+            }
+        });
     </script>
 </body>
 </html>
