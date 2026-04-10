@@ -28,10 +28,17 @@ class DashboardContoller extends Controller
             '61+' => DataOrangModel::where('usia', '>', 60)->count(),
         ];
         
+        $dailyCounts = DataOrangModel::selectRaw('DATE(created_at) as tanggal, COUNT(*) as count')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get()
+            ->pluck('count', 'tanggal');
+        
         return response()->json([
             'total' => $totalData,
             'gender' => $genderData,
-            'age' => $ageCategories
+            'age' => $ageCategories,
+            'daily' => $dailyCounts,
         ]);
     }
 }

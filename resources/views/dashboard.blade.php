@@ -85,7 +85,7 @@
     </div>
 
     <div class="main-content">
-        <div style="display: flex; gap: 20px;">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
             <div style="width: 400px;">
                 <h3>Jenis Kelamin</h3>
                 <canvas id="genderChart"></canvas>
@@ -93,6 +93,10 @@
             <div style="width: 400px;">
                 <h3>Usia</h3>
                 <canvas id="ageChart"></canvas>
+            </div>
+            <div style="width: 820px; margin-top: 20px;">
+                <h3>Agregasi Per Tanggal</h3>
+                <canvas id="dailyChart"></canvas>
             </div>
         </div>
     </div>
@@ -144,6 +148,48 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
+                            }
+                        }
+                    }
+                });
+
+                // Daily Column Chart
+                const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+                new Chart(dailyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data.daily),
+                        datasets: [{
+                            label: 'Jumlah Data',
+                            data: Object.values(data.daily),
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#2563eb',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tanggal'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Jumlah'
+                                },
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
                             }
                         }
                     }
