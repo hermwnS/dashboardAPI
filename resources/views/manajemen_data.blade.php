@@ -310,7 +310,7 @@
     <div class="main-content">
         <div class="page-header">
             <h1 class="page-title">Manajemen Data</h1>
-            <button class="sync-button">Sync Data</button>
+            <a href="/manajemen_data/sync-data"><button class="sync-button">Sync Data</button></a>
         </div>
 
         <section class="content-card">
