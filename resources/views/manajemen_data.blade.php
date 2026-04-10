@@ -62,10 +62,34 @@
             overflow-y: auto;
         }
 
-        .page-title {
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+        }
+
+        .page-title {
             font-size: 1.7rem;
             letter-spacing: 0.02em;
+            margin: 0;
+        }
+
+        .sync-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 999px;
+            background-color: #10b981;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .sync-button:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
         }
 
         .content-card {
@@ -208,7 +232,10 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <h1 class="page-title">Manajemen Data</h1>
+        <div class="page-header">
+            <h1 class="page-title">Manajemen Data</h1>
+            <button class="sync-button">Sync Data</button>
+        </div>
 
         <section class="content-card">
             <form action="/manajemen_data/store" method="post">
