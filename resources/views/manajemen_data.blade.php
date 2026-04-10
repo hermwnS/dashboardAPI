@@ -205,18 +205,42 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 900px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+        .search-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
 
-            .button-row {
-                justify-content: stretch;
-            }
+        .search-form input[type="text"] {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
 
-            .button-row button {
-                width: 100%;
-            }
+        .search-form input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-form button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 12px;
+            background-color: #6b7280;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-form button:hover {
+            background-color: #4b5563;
         }
     </style>
 </head>
@@ -267,6 +291,10 @@
         </section>
 
         <section class="content-card">
+            <form method="GET" action="/manajemen_data" class="search-form">
+                <input type="text" name="search" placeholder="Cari berdasarkan nama atau alamat..." value="{{ $search ?? '' }}">
+                <button type="submit">Cari</button>
+            </form>
             <table class="data-table">
                 <thead>
                     <tr>

@@ -7,9 +7,13 @@ use Illuminate\Http\Request;
 
 class DataOrangContoller extends Controller
 {
-    public function index(){
-        $data_orang = DataOrangModel::all();
-        return view('manajemen_data', compact('data_orang'));
+    public function index(Request $request){
+        $search = $request->get('search');
+        $data_orang = DataOrangModel::when($search, function ($query, $search) {
+            return $query->where('nama', 'like', '%' . $search . '%')
+                         ->orWhere('alamat', 'like', '%' . $search . '%');
+        })->get();
+        return view('manajemen_data', compact('data_orang', 'search'));
     }
 
     public function store(Request $request){
